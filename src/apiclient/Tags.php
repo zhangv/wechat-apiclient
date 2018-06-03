@@ -14,7 +14,7 @@ trait Tags{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=$accesstoken";
 		$params = ['begin_openid' => $begin_openid];
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -29,7 +29,7 @@ trait Tags{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist?access_token=$accesstoken";
 		$params = ['openid_list' => $openid_list];
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -44,7 +44,7 @@ trait Tags{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist?access_token=$accesstoken";
 		$params = ['openid_list' => $openid_list];
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}

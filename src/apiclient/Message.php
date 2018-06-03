@@ -13,7 +13,7 @@ trait Message{
 			'topcolor' => $topcolor,
 			'data' => $data
 		];
-		$r = $this->httpPost("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -25,7 +25,7 @@ trait Message{
 			'msgtype' => 'text',
 			'text' => ['content'=>$text]
 		];
-		$r = $this->httpPost("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -37,7 +37,7 @@ trait Message{
 			'msgtype' => 'image',
 			'image' => ['media_id'=>$mediaid]
 		];
-		$r = $this->httpPost("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -63,7 +63,7 @@ trait Message{
 		}else{
 			$params[$msgtype] = ['media_id'=>$message];
 		}
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -78,7 +78,7 @@ trait Message{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/get?access_token=$accesstoken";
 		$params = ['msg_id'=>$msgid];
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}

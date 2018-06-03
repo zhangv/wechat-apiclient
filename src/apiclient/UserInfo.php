@@ -12,7 +12,7 @@ trait UserInfo{
 	 */
 	public function getUserInfo($openid,$oauthaccesstoken){
 		$url = "https://api.weixin.qq.com/sns/userinfo?access_token=$oauthaccesstoken&openid=$openid&lang=zh_CN";
-		$output=$this->httpGet($url);
+		$output=$this->get($url);
 		$r = json_decode($output);
 		return $r;
 	}
@@ -26,7 +26,7 @@ trait UserInfo{
 	public function getUserBaseInfo($openid,$accesstoken = null){//获取用户基本信息
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$accesstoken&openid=$openid&lang=zh_CN";
-		$output=$this->httpGet($url);
+		$output=$this->get($url);
 		$r = json_decode($output);
 		return $r;
 	}
@@ -45,7 +45,7 @@ trait UserInfo{
 			$userlist[] = ['openid'=>$openid,'lang'=>'zh_CN'];
 		}
 		$params = ['user_list' => $userlist];
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -61,7 +61,7 @@ trait UserInfo{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$accesstoken";
 		if($next_openid) $url .= "&next_openid=$next_openid";
-		$output=$this->httpGet($url);
+		$output=$this->get($url);
 		$r = json_decode($output);
 		return $r;
 	}

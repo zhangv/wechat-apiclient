@@ -51,7 +51,7 @@ class WechatApiClient {
 	public function isAccessTokenExpired($act){//accesstoken是否已经过期
 		$expired = false;
 		$url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={$act}";
-		$output=$this->httpGet($url);
+		$output=$this->get($url);
 		$r = json_decode($output);
 		if(!empty($r->errcode) && $r->errcode == '42001'){
 			$expired = true;
@@ -73,7 +73,7 @@ class WechatApiClient {
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-			$output=$this->httpGet($url);
+			$output=$this->get($url);
 			$r = json_decode($output);
 			if($r){
 				if(!empty($r->access_token)){
@@ -97,14 +97,14 @@ class WechatApiClient {
 		$appid = $this->config['appid'];
 		$appsecret = $this->config['appsecret'];
 		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appsecret&code=$code&grant_type=authorization_code";
-		$output=$this->httpGet($url);
+		$output=$this->get($url);
 		$r = json_decode($output);
 		return $r;
 	}
 
 	public function isOauthAccessTokenValid($accesstoken,$openid){
 		$url = "https://api.weixin.qq.com/sns/auth?access_token=$accesstoken&openid=$openid";
-		$output = $this->httpGet($url);
+		$output = $this->get($url);
 		return json_decode($output);
 	}
 
@@ -117,72 +117,21 @@ class WechatApiClient {
 	public function shortUrl($url,$action = 'long2short',$accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['action' => $action,'long_url'=>$url];
-		$r = $this->httpPost("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
 
-	private function httpGetWithInfo($url){//获取httpbody的同时返回httpinfo
-		$ch=curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);    //支持抓取302/301跳转后的页面内容
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($ch,CURLOPT_BINARYTRANSFER,true);
-		$result=curl_exec($ch);
-		$info = curl_getinfo($ch);
-		curl_close($ch);
-		return [$result,$info];
+	private function get($url){
+		return $this->httpClient->get($url);
 	}
-	private function httpGet($url){
-		$ch=curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);    //支持抓取302/301跳转后的页面内容
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($ch,CURLOPT_BINARYTRANSFER,true);
-		$result=curl_exec($ch);
-		curl_close($ch);
-		return $result;
-	}
-	private function httpPost($url, $params) {
-		$ch=curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);    //支持抓取302/301跳转后的页面内容
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		$result=curl_exec($ch);
-		curl_close($ch);
-		return $result;
-	}
-
-	private function get($url,$params){
-		if(empty($params['access_token'])) $params['access_token'] = $this->getAccessToken();
-		$geturl = $url;
-		if($params && count($params) > 0) $geturl = $url . '?' . http_build_query($params);
-		$ch=curl_init($geturl);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);    //支持抓取302/301跳转后的页面内容
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($ch,CURLOPT_BINARYTRANSFER,true);
-		$result=curl_exec($ch);
-
+	private function post($url, $params) {
+		$result = $this->httpClient->post($url,$params);
 		$json = json_decode($result);
 
-		if(!empty($json->errcode) && $json->errcode == 40001){// invalid credential, access_token is invalid or not latest
-			$newtoken = $this->getAccessToken();
-			if($newtoken !== false){
-				$params['access_token'] = $newtoken;
-				$geturl = $url . '?' . http_build_query($params);
-				$ch=curl_init($geturl);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);    //支持抓取302/301跳转后的页面内容
-				curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-				curl_setopt($ch,CURLOPT_BINARYTRANSFER,true);
-				$result=curl_exec($ch);
-			}
+		if(!empty($json->errcode)){// invalid credential, access_token is invalid or not latest
+			throw new Exception($json->errcode);
 		}
-		curl_close($ch);
-		return $result;
 	}
 
 	public function sign($data,$sign_type = self::SIGNTYPE_MD5) {
@@ -218,7 +167,7 @@ class WechatApiClient {
 			if(!$accessToken) $accessToken = $this->getAccessToken();
 			// $url = "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=$accessToken";
 			$url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?type={$type}&access_token=$accessToken";
-			$output=$this->httpGet($url);
+			$output=$this->get($url);
 			$r = json_decode($output);
 			if($r){
 				if(!empty($r->ticket)){

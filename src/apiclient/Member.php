@@ -16,7 +16,7 @@ trait Member{
 		$params = [
 			'card_id' => $cardid, 'code' => $code
 		];
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -33,7 +33,7 @@ trait Member{
 		$url = "https://api.weixin.qq.com/card/user/getcardlist?access_token=$accesstoken";
 		$params = ['openid' => $openid];
 		if($cardid) $params['card_id'] = $cardid;
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -71,7 +71,7 @@ trait Member{
 		if($custom_field_value1) $params['custom_field_value1'] = $custom_field_value1;
 		if($custom_field_value2) $params['custom_field_value2'] = $custom_field_value2;
 		if($custom_field_value3) $params['custom_field_value3'] = $custom_field_value3;
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -104,8 +104,7 @@ trait Member{
 		if($init_custom_field_value1) $params['init_custom_field_value1'] = $init_custom_field_value1;
 		if($init_custom_field_value2) $params['init_custom_field_value2'] = $init_custom_field_value2;
 		if($init_custom_field_value3) $params['init_custom_field_value3'] = $init_custom_field_value3;
-		var_dump($params);
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -155,7 +154,7 @@ trait Member{
 		if($balance_rules) $params['balance_rules'] = $balance_rules;
 		if($activate_url) $params['activate_url'] = $activate_url;
 		if($custom_cell1) $params['custom_cell1'] = $custom_cell1;
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -242,7 +241,7 @@ trait Member{
 				"custom_field_list" => ["喜欢的电影"]
 			];
 		}
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -258,7 +257,7 @@ trait Member{
 		$url = "https://api.weixin.qq.com/card/get?access_token=$accesstoken";
 		$params = ['card_id' => $cardid];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
-		$output=$this->httpPost($url,$params);
+		$output=$this->post($url,$params);
 		$r = json_decode($output);
 		return $r;
 	}
@@ -299,8 +298,7 @@ trait Member{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/card/update?access_token=$accesstoken";
 		$params = ['card_id' => $cardid,'member_card'=>$updates];
-//		print_r(json_encode($params));
-		$output=$this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$output=$this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($output);
 		return $r;
 	}
@@ -316,7 +314,7 @@ trait Member{
 		$url = "https://api.weixin.qq.com/card/membercard/activatetempinfo/get?access_token=$accesstoken";
 		$params = ['activate_ticket' => $activateTicket];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
-		$output=$this->httpPost($url,$params);
+		$output=$this->post($url,$params);
 		$r = json_decode($output);
 		return $r;
 	}
@@ -332,7 +330,7 @@ trait Member{
 		$url = "https://api.weixin.qq.com/card/code/decrypt?access_token=$accesstoken";
 		$params = ['encrypt_code' => $code];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
-		$output=$this->httpPost($url,$params);
+		$output=$this->post($url,$params);
 		$r = json_decode($output);
 		return $r->code;
 	}

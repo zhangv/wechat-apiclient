@@ -7,7 +7,6 @@ namespace zhangv\wechat\apiclient\util;
 
 class HttpClient{
 
-	const GET = 'get',POST = 'post', DELETE = 'delete',PUT = 'put';
 	private $instance = null;
 	private $errNo = null;
 	private $info = null;
@@ -24,11 +23,11 @@ class HttpClient{
 			curl_setopt($this->instance, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($this->instance, CURLOPT_FOLLOWLOCATION, true);
 			curl_setopt($this->instance, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($this->instance,CURLOPT_BINARYTRANSFER,true);
 		}
 	}
 
 	public function get($url,$params = array(),$headers = array(),$opts = array()) {
-		if (!$this->instance)	$this->initInstance($this->timeout);
 		if($params && count($params) > 0) $url .= '?' . http_build_query($params);
 		curl_setopt($this->instance, CURLOPT_URL, $url);
 		curl_setopt($this->instance, CURLOPT_HTTPGET, true);
@@ -36,12 +35,10 @@ class HttpClient{
 		curl_setopt_array($this->instance,$opts);
 		$result = $this->execute();
 		curl_close($this->instance);
-		$this->instance = null;
 		return $result;
 	}
 
 	public function post($url, $params = array(),$headers = array(),$opts = array()) {
-		if (!$this->instance)	$this->initInstance($this->timeout);
 		curl_setopt($this->instance, CURLOPT_URL, $url);
 		curl_setopt($this->instance, CURLOPT_POST, true);
 		curl_setopt($this->instance, CURLOPT_POSTFIELDS, $params);
@@ -49,7 +46,6 @@ class HttpClient{
 		curl_setopt_array($this->instance,$opts);
 		$result = $this->execute();
 		curl_close($this->instance);
-		$this->instance = null;
 		return $result;
 	}
 

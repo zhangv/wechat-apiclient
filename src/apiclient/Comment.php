@@ -13,7 +13,7 @@ trait Comment{
 	public function openComment($msg_data_id,$index = 0,$accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index];
-		$r = $this->httpPost("https://api.weixin.qq.com/cgi-bin/comment/open?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post("https://api.weixin.qq.com/cgi-bin/comment/open?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -29,7 +29,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/close?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -48,7 +48,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'begin' => $begin,'count' => $count,'type' => $type];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/list?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -65,7 +65,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'user_comment_id' => $user_comment_id];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/markelect?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -82,7 +82,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'user_comment_id' => $user_comment_id];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/unmarkelect?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -99,7 +99,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'user_comment_id' => $user_comment_id];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/delete?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -117,7 +117,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'user_comment_id' => $user_comment_id,'content'=>$content];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/reply/add?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
@@ -135,7 +135,7 @@ trait Comment{
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['msg_data_id' => $msg_data_id,'index' => $index,'user_comment_id' => $user_comment_id];
 		$url = "https://api.weixin.qq.com/cgi-bin/comment/reply/delete?access_token=$accesstoken";
-		$r = $this->httpPost($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 		$r = json_decode($r);
 		return $r;
 	}
