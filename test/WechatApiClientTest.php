@@ -1,8 +1,4 @@
 <?php
-/**
- * User: derekzhangv
- * Time: 2018/5/31 23:17
- */
 
 use zhangv\wechat\WechatApiClient;
 use zhangv\wechat\apiclient\util\HttpClient;
