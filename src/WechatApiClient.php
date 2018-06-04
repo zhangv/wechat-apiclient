@@ -38,6 +38,7 @@ class WechatApiClient {
 
 	public function __construct($conf){
 		$this->config = $conf;
+		$this->httpClient = new HttpClient();
 		$this->cacheProvider = new JsonFileCacheProvider();
 	}
 
