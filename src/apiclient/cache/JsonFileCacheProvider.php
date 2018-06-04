@@ -12,8 +12,8 @@ class JsonFileCacheProvider implements CacheProvider{
 		else $this->cacheDir = $cacheDir;
 	}
 
-	public function set($key,$jsonobj,$expireAt = null){
-		$data = $jsonobj;
+	public function set($key,$json,$expireAt = null){
+		$data = json_decode($json);
 		$data->expires_at = $expireAt;
 		$file = "{$this->cacheDir}/{$key}.json";
 		$fp = fopen($file, "w");
@@ -31,7 +31,7 @@ class JsonFileCacheProvider implements CacheProvider{
 				$this->clear($key);
 			}
 		}
-		return $cache;
+		return json_encode($cache);
 	}
 
 	public function clear($key){

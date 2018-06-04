@@ -1,19 +1,10 @@
 <?php
 
 namespace zhangv\wechat;
-require_once __DIR__ .'/util/HttpClient.php';
 use \Exception;
 use zhangv\wechat\apiclient\cache\CacheProvider;
+use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
 use zhangv\wechat\apiclient\util\HttpClient;
-
-//require_once __DIR__ .'/Media.php';
-//require_once __DIR__ .'/Menu.php';
-//require_once __DIR__ .'/Message.php';
-//require_once __DIR__ .'/Comment.php';
-//require_once __DIR__ .'/QRcode.php';
-//require_once __DIR__ .'/BlackList.php';
-//require_once __DIR__ .'/UserInfo.php';
-//require_once __DIR__ .'/Member.php';
 
 class WechatApiClient {
 
@@ -37,6 +28,7 @@ class WechatApiClient {
 	];
 	const SIGNTYPE_MD5 = 'MD5', SIGNTYPE_HMACSHA256 = 'HMAC-SHA256', SIGNTYPE_SHA1 = 'SHA1';
 	const TICKETTYPE_JSAPI = 'jsapi',TICKETTYPE_WXCARD = 'wx_card';
+	const CACHEKEY_ACCESSTOKEN = "wechatapiclient:access_token", CACHEKEY_TICKET = "wechatapiclient:ticket";
 
 	public $config = [];
 	/** @var  CacheProvider */
@@ -46,6 +38,19 @@ class WechatApiClient {
 
 	public function __construct($conf){
 		$this->config = $conf;
+		$this->cacheProvider = new JsonFileCacheProvider();
+	}
+
+	public function setHttpClient($httpClient){
+		$this->httpClient = $httpClient;
+	}
+
+	public function setCacheProvider($cacheProvider){
+		$this->cacheProvider = $cacheProvider;
+	}
+
+	public function getCacheProvider(){
+		return $this->cacheProvider;
 	}
 
 	public function isAccessTokenExpired($act){//accesstoken是否已经过期
@@ -60,7 +65,7 @@ class WechatApiClient {
 	}
 
 	public function getAccessToken(){
-		$key = "wechatapiclient:access_token";
+		$key = self::CACHEKEY_ACCESSTOKEN;
 		$accesstoken = null;
 		if($this->cacheProvider){
 			$cached = $this->cacheProvider->get($key);
@@ -132,6 +137,7 @@ class WechatApiClient {
 		if(!empty($json->errcode)){// invalid credential, access_token is invalid or not latest
 			throw new Exception($json->errcode);
 		}
+		return $json;
 	}
 
 	public function sign($data,$sign_type = self::SIGNTYPE_MD5) {
@@ -156,7 +162,7 @@ class WechatApiClient {
 
 	public function getTicket($type = self::TICKETTYPE_JSAPI, $accessToken = null){
 		$ticket = null;
-		$key = "wechatapiclient:{$type}_ticket";
+		$key = "wechatapiclient:ticket:{$type}";
 		if($this->cacheProvider){
 			$cached = $this->cacheProvider->get($key);
 			if($cached && $cached = json_decode($cached)){
