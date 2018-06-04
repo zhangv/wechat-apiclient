@@ -15,7 +15,6 @@ trait BlackList{
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=$accesstoken";
 		$params = ['begin_openid' => $begin_openid];
 		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
 		return $r;
 	}
 
@@ -30,7 +29,6 @@ trait BlackList{
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist?access_token=$accesstoken";
 		$params = ['openid_list' => $openid_list];
 		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
 		return $r;
 	}
 
@@ -45,7 +43,6 @@ trait BlackList{
 		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist?access_token=$accesstoken";
 		$params = ['openid_list' => $openid_list];
 		$r = $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
 		return $r;
 	}
 }

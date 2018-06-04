@@ -24,10 +24,7 @@ trait QRcode{
 		}elseif($type == WechatApiClient::QRTYPE_FOREVER_STR){
 			$params['action_info']['scene']['scene_str'] = $sceneid;
 		}
-		$r = $this->post("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
-		//{"ticket":"gQG28DoAAAAAAAAAASxodHRwOi8vd2VpeGluLnFxLmNvbS9xL0FuWC1DNmZuVEhvMVp4NDNMRnNRAAIEesLvUQMECAcAAA==","expire_seconds":1800}
-		return $r;
+		return $this->post("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
 	/**
@@ -37,9 +34,7 @@ trait QRcode{
 	 */
 	public function showQRcode($ticket){
 		$url = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=$ticket";
-		$output=$this->get($url);
-		return $output;
+		return $this->get($url);
 	}
-
 
 }

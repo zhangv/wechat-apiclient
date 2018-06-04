@@ -11,9 +11,7 @@ trait Menu{
 	 */
 	public function createMenu($menu , $accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$r = $this->post("https://api.weixin.qq.com/cgi-bin/menu/create?access_token=$accesstoken",json_encode($menu,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
-		return $r;
+		return $this->post("https://api.weixin.qq.com/cgi-bin/menu/create?access_token=$accesstoken",json_encode($menu,JSON_UNESCAPED_UNICODE));
 	}
 
 	/**
@@ -24,9 +22,7 @@ trait Menu{
 	public function getMenu( $accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=$accesstoken";
-		$output=$this->get($url);
-		$r = json_decode($output);
-		return $r;
+		return $this->get($url);
 	}
 
 }

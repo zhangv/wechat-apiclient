@@ -79,8 +79,7 @@ class WechatApiClient {
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-			$output=$this->get($url);
-			$r = json_decode($output);
+			$r =$this->get($url);
 			if($r){
 				if(!empty($r->access_token)){
 					$accesstoken = $r->access_token;
@@ -89,10 +88,10 @@ class WechatApiClient {
 						$this->cacheProvider->set($key, json_encode($r), $expires_at);
 					}
 				}else{
-					throw new Exception("Access token missing in ".print_r($output,true));
+					throw new Exception("Access token missing in ".print_r(json_encode($r),true));
 				}
 			}else{
-				throw new Exception("Not a valid json: ".print_r($output,true));
+				throw new Exception("Not a valid json: ".print_r(json_encode($r),true));
 			}
 		}
 
@@ -111,7 +110,7 @@ class WechatApiClient {
 	public function isOauthAccessTokenValid($accesstoken,$openid){
 		$url = "https://api.weixin.qq.com/sns/auth?access_token=$accesstoken&openid=$openid";
 		$output = $this->get($url);
-		return json_decode($output);
+		return $output;
 	}
 
 	/**
@@ -129,10 +128,17 @@ class WechatApiClient {
 	}
 
 	private function get($url){
-		return $this->httpClient->get($url);
+		$result = $this->httpClient->get($url);
+		$json = $this->processResult($result);
+		return $json;
 	}
 	private function post($url, $params) {
 		$result = $this->httpClient->post($url,$params);
+		$json = $this->processResult($result);
+		return $json;
+	}
+
+	private function processResult($result){
 		$json = json_decode($result);
 
 		if(!empty($json->errcode)){// invalid credential, access_token is invalid or not latest
@@ -174,8 +180,7 @@ class WechatApiClient {
 			if(!$accessToken) $accessToken = $this->getAccessToken();
 			// $url = "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=$accessToken";
 			$url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?type={$type}&access_token=$accessToken";
-			$output=$this->get($url);
-			$r = json_decode($output);
+			$r=$this->get($url);
 			if($r){
 				if(!empty($r->ticket)){
 					$ticket = $r->ticket;
@@ -184,10 +189,10 @@ class WechatApiClient {
 						$this->cacheProvider->set($key, json_encode($r), $expires_at);
 					}
 				}else{
-					throw new Exception("Ticket missing in: ".print_r($output,true));
+					throw new Exception("Ticket missing in: ".print_r(json_encode($r),true));
 				}
 			}else{
-				throw new Exception("Not a valid json: ".print_r($output,true));
+				throw new Exception("Not a valid json: ".print_r(json_encode($r),true));
 			}
 		}
 		return $ticket;
