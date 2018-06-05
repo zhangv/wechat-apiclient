@@ -13,9 +13,7 @@ trait Member{
 	public function getMember($cardid,$code,$accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/card/membercard/userinfo/get?access_token=$accesstoken";
-		$params = [
-			'card_id' => $cardid, 'code' => $code
-		];
+		$params = ['card_id' => $cardid, 'code' => $code];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 

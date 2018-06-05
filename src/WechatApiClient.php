@@ -57,8 +57,7 @@ class WechatApiClient {
 	public function isAccessTokenExpired($act){//accesstoken是否已经过期
 		$expired = false;
 		$url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={$act}";
-		$output=$this->get($url);
-		$r = json_decode($output);
+		$r =$this->get($url);
 		if(!empty($r->errcode) && $r->errcode == '42001'){
 			$expired = true;
 		}
@@ -102,15 +101,12 @@ class WechatApiClient {
 		$appid = $this->config['appid'];
 		$appsecret = $this->config['appsecret'];
 		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appsecret&code=$code&grant_type=authorization_code";
-		$output=$this->get($url);
-		$r = json_decode($output);
-		return $r;
+		return $this->get($url);
 	}
 
 	public function isOauthAccessTokenValid($accesstoken,$openid){
 		$url = "https://api.weixin.qq.com/sns/auth?access_token=$accesstoken&openid=$openid";
-		$output = $this->get($url);
-		return $output;
+		return $this->get($url);
 	}
 
 	/**
@@ -122,9 +118,7 @@ class WechatApiClient {
 	public function shortUrl($url,$action = 'long2short',$accesstoken = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
 		$params = ['action' => $action,'long_url'=>$url];
-		$r = $this->post("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
-		$r = json_decode($r);
-		return $r;
+		return $this->post("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
 	private function get($url){
@@ -140,9 +134,8 @@ class WechatApiClient {
 
 	private function processResult($result){
 		$json = json_decode($result);
-
-		if(!empty($json->errcode)){// invalid credential, access_token is invalid or not latest
-			throw new Exception($json->errcode);
+		if(!empty($json->errcode) && $json->errcode !== 0){// invalid credential, access_token is invalid or not latest
+			throw new Exception("[{$json->errcode}]{$json->errmsg}");
 		}
 		return $json;
 	}
