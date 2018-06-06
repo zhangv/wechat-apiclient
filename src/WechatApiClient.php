@@ -6,6 +6,8 @@ use zhangv\wechat\apiclient\cache\CacheProvider;
 use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
 use zhangv\wechat\apiclient\util\HttpClient;
 
+include_once "../crypt/wxBizDataCrypt.php";
+
 class WechatApiClient {
 
 	use apiclient\Media;
@@ -16,6 +18,7 @@ class WechatApiClient {
 	use apiclient\Comment;
 	use apiclient\UserInfo;
 	use apiclient\Member;
+	use apiclient\Wxa;
 
 	const MSGTYPE_MPNEWS = 'mpnews',MSGTYPE_TEXT = 'text',MSGTYPE_MPVIDEO = 'mpvideo',MSGTYPE_VOICE = 'voice',MSGTYPE_IMAGE = 'image',MSGTYPE_WXCARD = 'wxcard';
 	const MEDIATYPE_IMAGE = 'image',MEDIATYPE_VOICE = 'voice',MEDIATYPE_VIDEO = 'video',MEDIATYPE_THUMB = 'thumb';
@@ -191,4 +194,9 @@ class WechatApiClient {
 		return $ticket;
 	}
 
+	public function decryptData($sessionKey, $encryptedData, $iv, &$data){
+		$pc = new WXBizDataCrypt($this->config['appid'], $sessionKey);
+		$errCode = $pc->decryptData($encryptedData, $iv, $data);
+		return $errCode;
+	}
 }

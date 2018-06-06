@@ -36,7 +36,6 @@ class HttpClient{
 		curl_setopt($this->instance, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt_array($this->instance,$opts);
 		$result = $this->execute();
-		curl_close($this->instance);
 		return $result;
 	}
 
@@ -48,7 +47,6 @@ class HttpClient{
 		curl_setopt($this->instance, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt_array($this->instance,$opts);
 		$result = $this->execute();
-		curl_close($this->instance);
 		return $result;
 	}
 
