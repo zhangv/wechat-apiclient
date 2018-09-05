@@ -10,9 +10,8 @@ trait Wxa{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function msgSecCheck($content,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/wxa/msg_sec_check?access_token=$accesstoken";
+	public function msgSecCheck($content){
+		$url = "https://api.weixin.qq.com/wxa/msg_sec_check";
 		$params = ['content' => $content];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
@@ -23,9 +22,8 @@ trait Wxa{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function imgSecCheck($imgpath,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/wxa/img_sec_check?access_token=$accesstoken";
+	public function imgSecCheck($imgpath){
+		$url = "https://api.weixin.qq.com/wxa/img_sec_check";
 		$file = realpath($imgpath); //要上传的文件
 		$params['media'] = new CURLFile($file);
 		return $this->post($url,$params);

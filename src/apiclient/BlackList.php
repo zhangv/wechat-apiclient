@@ -10,9 +10,8 @@ trait BlackList{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getBlacklistMembers($begin_openid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=$accesstoken";
+	public function getBlacklistMembers($begin_openid){
+		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist";
 		$params = ['begin_openid' => $begin_openid];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
@@ -23,9 +22,8 @@ trait BlackList{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function batchBlacklistMembers($openid_list,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist?access_token=$accesstoken";
+	public function batchBlacklistMembers($openid_list){
+		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist";
 		$params = ['openid_list' => $openid_list];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
@@ -36,9 +34,8 @@ trait BlackList{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function batchUnBlacklistMembers($openid_list,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist?access_token=$accesstoken";
+	public function batchUnBlacklistMembers($openid_list){
+		$url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist";
 		$params = ['openid_list' => $openid_list];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}

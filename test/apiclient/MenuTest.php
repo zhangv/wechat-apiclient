@@ -19,8 +19,11 @@ class MenuTest extends TestCase{
 	public function createMenu(){
 		$this->httpClient->method('post')->willReturn(
 			'{"errcode":0,"errmsg":"ok"}');
+		$this->httpClient->method('get')->willReturn(
+			'{"access_token":"TOKEN","expires_in":7200}');
+
 		$this->api->setHttpClient($this->httpClient);
-		$r = $this->api->createMenu([],'t');
+		$r = $this->api->createMenu([]);
 		$this->assertEquals('ok',$r->errmsg);
 	}
 

@@ -21,8 +21,8 @@ trait UserInfo{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getUserBaseInfo($openid,$accesstoken = null){//获取用户基本信息
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function getUserBaseInfo($openid){//获取用户基本信息
+		$accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$accesstoken&openid=$openid&lang=zh_CN";
 		return $this->get($url);
 	}
@@ -33,9 +33,8 @@ trait UserInfo{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function batchGetUserInfo($openids,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=$accesstoken";
+	public function batchGetUserInfo($openids){
+		$url = "https://api.weixin.qq.com/cgi-bin/user/info/batchget";
 		$userlist = [];
 		foreach($openids as $openid){
 			$userlist[] = ['openid'=>$openid,'lang'=>'zh_CN'];
@@ -51,8 +50,8 @@ trait UserInfo{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getUser($next_openid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function getUser($next_openid){
+		$accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$accesstoken";
 		if($next_openid) $url .= "&next_openid=$next_openid";
 		return $this->get($url);

@@ -26,12 +26,12 @@ class JsonFileCacheProvider implements CacheProvider{
 		$cache = null;
 		if(file_exists($file)){
 			$cache = json_decode(file_get_contents($file));
-			if($cache->expires_at < time()){
+			if(!$cache || $cache->expires_at < time()){
 				$cache = null;
 				$this->clear($key);
 			}
 		}
-		return json_encode($cache);
+		return $cache?json_encode($cache):null;
 	}
 
 	public function clear($key){

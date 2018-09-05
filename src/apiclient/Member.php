@@ -10,9 +10,8 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMember($cardid,$code,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/membercard/userinfo/get?access_token=$accesstoken";
+	public function getMember($cardid,$code){
+		$url = "https://api.weixin.qq.com/card/membercard/userinfo/get";
 		$params = ['card_id' => $cardid, 'code' => $code];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
@@ -24,9 +23,8 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getCardList($openid,$cardid = null,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/user/getcardlist?access_token=$accesstoken";
+	public function getCardList($openid,$cardid = null){
+		$url = "https://api.weixin.qq.com/card/user/getcardlist";
 		$params = ['openid' => $openid];
 		if($cardid) $params['card_id'] = $cardid;
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
@@ -34,7 +32,7 @@ trait Member{
 
 	/**
 	 * 更新会员信息
-	 * TODO: 43010 - can not use balance, need authorize hint: [qBBjQa03232947]
+	 * Note: 43010 - You have to apply the function
 	 * @param $code
 	 * @param $cardid
 	 * @param $bonus
@@ -51,10 +49,8 @@ trait Member{
 	 */
 	public function updateMember($code,$cardid,$bonus,$add_bonus,$balance,
 	                             $add_balance = null,$record_bonus = null,$record_balance = null,
-	                             $custom_field_value1 = null,$custom_field_value2 = null,$custom_field_value3 = null,
-	                             $accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/membercard/updateuser?access_token=$accesstoken";
+	                             $custom_field_value1 = null,$custom_field_value2 = null,$custom_field_value3 = null){
+		$url = "https://api.weixin.qq.com/card/membercard/updateuser";
 		$params = ['card_id' => $cardid, 'code' => $code];
 		if($bonus) $params['$bonus'] = $bonus;
 		if($add_bonus) $params['add_bonus'] = $add_bonus;
@@ -65,6 +61,53 @@ trait Member{
 		if($custom_field_value1) $params['custom_field_value1'] = $custom_field_value1;
 		if($custom_field_value2) $params['custom_field_value2'] = $custom_field_value2;
 		if($custom_field_value3) $params['custom_field_value3'] = $custom_field_value3;
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+	public function updateMemberCardBalance($code,$cardid,$balance, $add_balance  = null,
+	                                        $record_balance = null, $isNotify = true){
+		$url = "https://api.weixin.qq.com/card/membercard/updateuser";
+		$params = ['card_id' => $cardid, 'code' => $code];
+		if($balance) $params['balance'] = $balance;
+		if($add_balance) $params['add_balance'] = $add_balance;
+		if($record_balance) $params['record_balance'] = $record_balance;
+		$params['notify_optional'] = ['is_notify_balance' => $isNotify];
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+	public function updateMemberCardBonus($code,$cardid,$bonus,$add_bonus,$record_bonus = null, $isNotify = true){
+		$url = "https://api.weixin.qq.com/card/membercard/updateuser";
+		$params = ['card_id' => $cardid, 'code' => $code];
+		if($bonus) $params['$bonus'] = $bonus;
+		if($add_bonus) $params['add_bonus'] = $add_bonus;
+		if($record_bonus) $params['record_bonus'] = $record_bonus;
+		$params['notify_optional'] = ['is_notify_bonus' => $isNotify];
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+
+	/**
+	 * 更新会员余额
+	 * @param $code
+	 * @param $cardid
+	 * @param $bonus
+	 * @param $add_bonus
+	 * @param $balance
+	 * @param null $add_balance
+	 * @param null $record_bonus
+	 * @param null $record_balance
+	 * @param null $custom_field_value1
+	 * @param null $custom_field_value2
+	 * @param null $custom_field_value3
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function updateBalance($code,$cardid,$balance, $add_balance = null,$record_balance = null){
+		$url = "https://api.weixin.qq.com/card/membercard/updateuser";
+		$params = ['card_id' => $cardid, 'code' => $code];
+		if($balance) $params['balance'] = $balance;
+		if($add_balance) $params['add_balance'] = $add_balance;
+		if($record_balance) $params['record_balance'] = $record_balance;
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
@@ -85,9 +128,8 @@ trait Member{
 	 */
 	public function activateMember($card_id,$membership_number,$code,$activate_begin_time = null,$activate_end_time = null,
 	                               $init_bonus = null,$init_balance = null, $init_custom_field_value1 = null,
-	                               $init_custom_field_value2 = null,$init_custom_field_value3 = null,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/membercard/activate?access_token=$accesstoken";
+	                               $init_custom_field_value2 = null,$init_custom_field_value3 = null){
+		$url = "https://api.weixin.qq.com/card/membercard/activate";
 		$params = ['card_id'=> $card_id,'membership_number' => $membership_number,'code' => $code];
 		if($activate_begin_time) $params['activate_begin_time'] = $activate_begin_time;
 		if($activate_end_time) $params['activate_end_time'] = $activate_end_time;
@@ -124,10 +166,8 @@ trait Member{
 	                                 $supply_bonus = false,$bonus_url = null,$supply_balance = false,
 	                                 $balance_url = null,$custom_field1 = [],$custom_field2 = [],$custom_field3 = [],
 	                                 $bonus_cleared = null,$bonus_rules = null,
-	                                 $balance_rules = null,$activate_url = null,$custom_cell1 = [],
-	                                 $accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/create?access_token=$accesstoken";
+	                                 $balance_rules = null,$activate_url = null,$custom_cell1 = []){
+		$url = "https://api.weixin.qq.com/card/create";
 		$params = ['card_type' => 'MEMBER_CARD','base_info' => $base_info,'prerogative' => $prerogative];
 		if($auto_activate) $params['auto_activate'] = $auto_activate;
 		if($wx_activate) $params['wx_activate'] = $wx_activate;
@@ -207,9 +247,8 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function setActivationForm($card_id,$required_form = null,$optional_form = null,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/membercard/activateuserform/set?access_token=$accesstoken";
+	public function setActivationForm($card_id,$required_form = null,$optional_form = null){
+		$url = "https://api.weixin.qq.com/card/membercard/activateuserform/set";
 		$params = ['card_id' => $card_id];
 		if(!$required_form) {
 			$params['required_form'] = [
@@ -238,9 +277,8 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMemberCard($cardid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/get?access_token=$accesstoken";
+	public function getMemberCard($cardid){
+		$url = "https://api.weixin.qq.com/card/get";
 		$params = ['card_id' => $cardid];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
 		return $this->post($url,$params);
@@ -252,7 +290,7 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function updateMemberCard($cardid,$memberCard,$accesstoken = null){
+	public function updateMemberCard($cardid,$memberCard){
 		$updatables = [
 			'background_pic_url','bonus_cleared','bonus_rules','balance_rules','prerogative','wx_activate','auto_activate','activate_url',
 			'custom_field1','custom_field2','custom_field3', 'name_type','url','custom_cell1','bonus_rule','cost_money_unit',
@@ -279,9 +317,101 @@ trait Member{
 			$baseinfo_updates[$updatable] = $memberCard->base_info->$updatable;
 		}
 		$updates['base_info'] = $baseinfo_updates;
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/update?access_token=$accesstoken";
+		$url = "https://api.weixin.qq.com/card/update";
 		$params = ['card_id' => $cardid,'member_card'=>$updates];
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+	/**
+	 * 更新会员卡开卡跳转方式
+	 * @param $cardid
+	 * @param bool $activate
+	 * @param bool $activateAfterSubmit
+	 * @param null $activateAfterSubmitUrl
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function updateMemberCardActivate($cardid, $activate = true,$activateAfterSubmit = false, $activateAfterSubmitUrl = null){
+		$params = [
+			'card_id' => $cardid,
+			'member_card' => [
+				'wx_activate' => $activate,
+				'wx_activate_after_submit' => $activateAfterSubmit,
+				'wx_activate_after_submit_url' => $activateAfterSubmitUrl
+			]
+		];
+		$url = "https://api.weixin.qq.com/card/update";
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+	/**
+	 * 更新自定义信息
+	 * @param string $cardid
+	 * @param array $custom_field_value1
+	 * @param array $custom_field_value2
+	 * @param array $custom_field_value3
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function updateCustomField($cardid,$custom_field_value1 = null,$custom_field_value2 = null,$custom_field_value3 = null){
+		$url = "https://api.weixin.qq.com/card/update";
+		if($custom_field_value1) $params['custom_field1'] = $custom_field_value1;
+		if($custom_field_value2) $params['custom_field2'] = $custom_field_value2;
+		if($custom_field_value3) $params['custom_field3'] = $custom_field_value3;
+
+		$params = [
+			'card_id' => $cardid,
+			'member_card' => $params
+		];
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+
+	/**
+	 * 更新会员卡支持微信支付刷卡
+	 * @param $cardId
+	 * @param bool $isSwipeCard
+	 * @param bool $isPayAndQrcode 会员卡二维码增加微信支付入口
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function updateMemberCardPayInfo($cardId,$isSwipeCard = true, $isPayAndQrcode = false){
+		$params = [
+			'card_id' => $cardId,
+			'member_card' => [
+				'base_info' => [
+					'pay_info' => [
+						'swipe_card' =>[
+							'is_swipe_card' => $isSwipeCard
+						]
+					],
+					'is_pay_and_qrcode' => $isPayAndQrcode
+				]
+			]
+		];
+		$url = "https://api.weixin.qq.com/card/update";
+		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
+	}
+
+	/**
+	 *
+	 * @param $cardId
+	 * @param bool $isSwipeCard
+	 * @param bool $isPayAndQrcode 会员卡二维码增加微信支付入口
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function updateMemberCardPromotion($cardId,$name,$url, $subTitle = ''){
+		$params = [
+			'card_id' => $cardId,
+			'member_card' => [
+				'base_info' => [
+					'promotion_url' => $url,
+					'promotion_url_name' => $name,
+					'promotion_url_sub_title' => $subTitle
+				]
+			]
+		];
+		$url = "https://api.weixin.qq.com/card/update";
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
@@ -291,10 +421,22 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getActivateTempInfo($activateTicket,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/membercard/activatetempinfo/get?access_token=$accesstoken";
+	public function getActivateTempInfo($activateTicket){
+		$url = "https://api.weixin.qq.com/card/membercard/activatetempinfo/get";
 		$params = ['activate_ticket' => $activateTicket];
+		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
+		return $this->post($url,$params);
+	}
+
+	/**
+	 * 获取开卡组件链接
+	 * @param $activateTicket
+	 * @param null $accesstoken
+	 * @return mixed
+	 */
+	public function getActivateUrl($cardId,$outer_str = null){
+		$url = "https://api.weixin.qq.com/card/membercard/activate/geturl";
+		$params = ['card_id' => $cardId,'outer_str' => $outer_str];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
 		return $this->post($url,$params);
 	}
@@ -305,9 +447,8 @@ trait Member{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function decryptCode($code,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/card/code/decrypt?access_token=$accesstoken";
+	public function decryptCode($code){
+		$url = "https://api.weixin.qq.com/card/code/decrypt";
 		$params = ['encrypt_code' => $code];
 		$params = json_encode($params,JSON_UNESCAPED_UNICODE);
 		return $this->post($url,$params);

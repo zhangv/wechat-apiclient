@@ -4,8 +4,8 @@ namespace zhangv\wechat\apiclient;
 
 trait Media{
 
-	public function downloadMedia($media,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function downloadMedia($media){//not test
+		$accesstoken = $this->getAccessToken();
 		$url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=$accesstoken&media_id=$media";
 		$output=$this->get($url);
 		$package = $output[0];
@@ -30,12 +30,11 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function uploadMedia($type,$mediapath,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function uploadMedia($type,$mediapath){
 		$file = realpath($mediapath); //要上传的文件
 		$fields['media'] = new CURLFile($file);
-		$url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=$accesstoken&type=$type";
-		$r=$this->post($url,$fields);
+		$url = "https://api.weixin.qq.com/cgi-bin/media/upload";
+		$r=$this->post($url,$fields,false,['type' => $type]);
 		return $r;
 	}
 
@@ -45,8 +44,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMedia($mediaid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function getMedia($mediaid){
+		$accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$accesstoken&media_id=$mediaid";
 		$r=$this->get($url);
 		return $r;
@@ -58,11 +57,10 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function uploadImage($mediapath,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function uploadImage($mediapath){
 		$file = realpath($mediapath); //要上传的文件
 		$fields['media'] = new CURLFile($file);
-		$url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=$accesstoken";
+		$url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg";
 		$r=$this->post($url,$fields);
 		return $r;
 	}
@@ -73,9 +71,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function addNews($articles,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/material/add_news?access_token=$accesstoken";
+	public function addNews($articles){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/add_news";
 		return $this->post($url,json_encode($articles,JSON_UNESCAPED_UNICODE));
 	}
 
@@ -85,9 +82,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function updateNews($mediaid,$index,$article,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/material/update_news?access_token=$accesstoken";
+	public function updateNews($mediaid,$index,$article){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/update_news";
 		$fields = [
 			'media_id' => $mediaid,
 			'index' => $index,
@@ -101,8 +97,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMaterialCount($accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function getMaterialCount(){
+		$accesstoken = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token=$accesstoken";
 		return $this->get($url);
 	}
@@ -116,13 +112,13 @@ trait Media{
 	 */
 	public function addMaterial($type,$mediapath,$accesstoken = null,$videotitle = null,$videointro = null){
 		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=$accesstoken&type=$type";
+		$url = "https://api.weixin.qq.com/cgi-bin/material/add_material";
 		$file = realpath($mediapath); //要上传的文件
 		$fields['media'] = new CURLFile($file);
 		if($type == WechatApiClient::MEDIATYPE_VIDEO){//在上传视频素材时需要POST另一个表单，id为description，包含素材的描述信息，内容格式为JSON
 			$fields['description'] = json_encode(['title'=>$videotitle,'introduction'=>$videointro]);
 		}
-		return $this->post($url,$fields);
+		return $this->post($url,$fields,false,['type' => $type]);
 	}
 
 	/**
@@ -131,9 +127,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMaterial($mediaid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=$accesstoken";
+	public function getMaterial($mediaid){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/get_material";
 		$fields['media_id'] = $mediaid;
 		return $this->post($url,json_encode($fields,JSON_UNESCAPED_UNICODE));
 	}
@@ -144,8 +139,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function delMaterial($mediaid,$accesstoken = null){
-		$url = "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token=$accesstoken";
+	public function delMaterial($mediaid){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/del_material";
 		$fields['media_id'] = $mediaid;
 		return $this->post($url,json_encode($fields,JSON_UNESCAPED_UNICODE));
 	}
@@ -158,8 +153,8 @@ trait Media{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function batchGetMaterial($type,$offset,$count,$accesstoken = null){
-		$url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=$accesstoken";
+	public function batchGetMaterial($type,$offset,$count){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material";
 		$fields = ['type' => $type,'offset'=>$offset,'count'=>$count];
 		return $this->post($url,json_encode($fields,JSON_UNESCAPED_UNICODE));
 	}

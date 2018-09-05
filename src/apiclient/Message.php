@@ -4,8 +4,7 @@ namespace zhangv\wechat\apiclient;
 
 trait Message{
 
-	public function sendMsg($touser,$templateid,$url,$data,$topcolor = '#FF0000',$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function sendMsg($touser,$templateid,$url,$data,$topcolor = '#FF0000'){
 		$params = [
 			'touser' => $touser,
 			'template_id' => $templateid,
@@ -13,27 +12,25 @@ trait Message{
 			'topcolor' => $topcolor,
 			'data' => $data
 		];
-		return $this->post("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		return $this->post("https://api.weixin.qq.com/cgi-bin/message/template/send",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
-	public function sendCustomMsgText($touser,$text,$accesstoken = null){//小程序发送文本客服消息
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function sendCustomMsgText($touser,$text){//小程序发送文本客服消息
 		$params = [
 			'touser' => $touser,
 			'msgtype' => 'text',
 			'text' => ['content'=>$text]
 		];
-		return $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		return $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
-	public function sendCustomMsgImage($touser,$mediaid,$accesstoken = null){//小程序发送图片客服消息
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function sendCustomMsgImage($touser,$mediaid){//小程序发送图片客服消息
 		$params = [
 			'touser' => $touser,
 			'msgtype' => 'image',
 			'image' => ['media_id'=>$mediaid]
 		];
-		return $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send??access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		return $this->post("https://api.weixin.qq.com/cgi-bin/message/custom/send",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
 	/**
@@ -45,9 +42,8 @@ trait Message{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function massPreview($touser,$message,$msgtype,$towxname = null,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=$accesstoken";
+	public function massPreview($touser,$message,$msgtype,$towxname = null){
+		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/preview";
 		$params = ['touser'=>$touser,'msgtype'=>$msgtype];
 		if($towxname) $params['towxname'] = $towxname;
 		if($msgtype == WechatApiClient::MSGTYPE_TEXT){
@@ -66,9 +62,8 @@ trait Message{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getMassMessage($msgid,$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/get?access_token=$accesstoken";
+	public function getMassMessage($msgid){
+		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/get";
 		$params = ['msg_id'=>$msgid];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}

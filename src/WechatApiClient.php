@@ -6,7 +6,6 @@ use zhangv\wechat\apiclient\cache\CacheProvider;
 use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
 use zhangv\wechat\apiclient\util\HttpClient;
 
-include_once "../crypt/wxBizDataCrypt.php";
 
 class WechatApiClient {
 
@@ -57,17 +56,7 @@ class WechatApiClient {
 		return $this->cacheProvider;
 	}
 
-	public function isAccessTokenExpired($act){//accesstoken是否已经过期
-		$expired = false;
-		$url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token={$act}";
-		$r =$this->get($url);
-		if(!empty($r->errcode) && $r->errcode == '42001'){
-			$expired = true;
-		}
-		return $expired;
-	}
-
-	public function getAccessToken(){
+	public function getAccessToken($refresh = false){
 		$key = self::CACHEKEY_ACCESSTOKEN;
 		$accesstoken = null;
 		if($this->cacheProvider){
@@ -77,7 +66,7 @@ class WechatApiClient {
 			}
 		}
 
-		if(!$accesstoken){
+		if(!$accesstoken || $refresh === true){
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
@@ -118,25 +107,48 @@ class WechatApiClient {
 	 * @param $action
 	 * @return mixed
 	 */
-	public function shortUrl($url,$action = 'long2short',$accesstoken = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function shortUrl($url,$action = 'long2short'){
 		$params = ['action' => $action,'long_url'=>$url];
-		return $this->post("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=$accesstoken",json_encode($params,JSON_UNESCAPED_UNICODE));
+		return $this->post("https://api.weixin.qq.com/cgi-bin/shorturl",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
-	private function get($url){
+	private function get($url,$raw = false){
 		$result = $this->httpClient->get($url);
+		if($raw === true){
+			return $result;
+		}
 		$json = $this->processResult($result);
 		return $json;
 	}
-	private function post($url, $params) {
-		$result = $this->httpClient->post($url,$params);
+
+	private function post($url, $params, $raw = false, $querydata = []) {
+		$at = $this->getAccessToken();
+		$querydata['access_token'] = $at;
+		$url2 = $url . "?".http_build_query($querydata);
+		$result = $this->httpClient->post($url2,$params);
+		if(!$result){
+			$paramstr = print_r($params,true);
+			throw new Exception("Null result, with URL:[$url2],POSTFIELDS = [$paramstr]");
+		}
+
+		$json = json_decode($result);
+
+		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
+			$atnew = $this->getAccessToken(true);
+			$querydata['access_token'] = $atnew;
+			$url2 = $url . "?".http_build_query($querydata);
+			$result = $this->httpClient->post($url2,$params);
+		}
+		if($raw === true) return $result;
 		$json = $this->processResult($result);
 		return $json;
 	}
 
 	private function processResult($result){
 		$json = json_decode($result);
+		if($json === null){
+			throw new Exception("Bad formatted JSON - {$result}");
+		}
 		if(!empty($json->errcode) && $json->errcode !== 0){// invalid credential, access_token is invalid or not latest
 			throw new Exception("[{$json->errcode}]{$json->errmsg}");
 		}
@@ -194,9 +206,4 @@ class WechatApiClient {
 		return $ticket;
 	}
 
-	public function decryptData($sessionKey, $encryptedData, $iv, &$data){
-		$pc = new WXBizDataCrypt($this->config['appid'], $sessionKey);
-		$errCode = $pc->decryptData($encryptedData, $iv, $data);
-		return $errCode;
-	}
 }

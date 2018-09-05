@@ -9,6 +9,7 @@ class HttpClient{
 
 	private $instance = null;
 	private $errNo = null;
+	private $error = null;
 	private $info = null;
 	private $timeout = 1;
 
@@ -54,10 +55,11 @@ class HttpClient{
 		$result = curl_exec($this->instance);
 		$this->errNo = curl_errno($this->instance);
 		$this->info = curl_getinfo($this->instance);
+		$this->error = curl_error($this->instance);
 		return $result;
 	}
 
 	public function getInfo(){
-		return $this->info;
+		return $this->error;
 	}
 }

@@ -5,7 +5,7 @@ class AllTests extends TestSuite {
 
 	public static function suite() {
 		$suite = new TestSuite();
-		$tests = ['WechatApiClient','apiclient/Member','apiclient/Menu'];
+		$tests = ['WechatApiClient','apiclient/Menu'];
 		foreach($tests as $t){
 			$filePath = __DIR__ . "/{$t}Test.php";
 			require_once($filePath);
