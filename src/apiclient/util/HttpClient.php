@@ -60,6 +60,10 @@ class HttpClient{
 	}
 
 	public function getInfo(){
+		return $this->info;
+	}
+
+	public function getError(){
 		return $this->error;
 	}
 }

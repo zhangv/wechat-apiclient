@@ -40,7 +40,7 @@ class WechatApiClient {
 
 	public function __construct($conf){
 		$this->config = $conf;
-		$this->httpClient = new HttpClient();
+		$this->httpClient = new HttpClient(3);//the menu create require more than 1 second
 		$this->cacheProvider = new JsonFileCacheProvider();
 	}
 
@@ -128,11 +128,13 @@ class WechatApiClient {
 		$result = $this->httpClient->post($url2,$params);
 		if(!$result){
 			$paramstr = print_r($params,true);
-			throw new Exception("Null result, with URL:[$url2],POSTFIELDS = [$paramstr]");
+			if($this->httpClient->getError() !== ''){
+				throw new Exception($this->httpClient->getError());
+			}else
+				throw new Exception("Null result, with URL:[$url2],POSTFIELDS = [$paramstr]");
 		}
 
 		$json = json_decode($result);
-
 		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
 			$atnew = $this->getAccessToken(true);
 			$querydata['access_token'] = $atnew;

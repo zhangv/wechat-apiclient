@@ -5,7 +5,6 @@ namespace zhangv\wechat\apiclient;
 trait Menu{
 	/**
 	 * 更新菜单
-	 * //TODO 存在更新时返回空的情况
 	 * @param $menu
 	 * @return mixed
 	 */
