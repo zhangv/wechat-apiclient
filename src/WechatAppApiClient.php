@@ -2,15 +2,11 @@
 
 namespace zhangv\wechat;
 use \Exception;
-use zhangv\wechat\apiclient\cache\CacheProvider;
-use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
-use zhangv\wechat\apiclient\util\HttpClient;
-
 
 class WechatAppApiClient extends WechatApiClient {
 	private $sessionKey;
 
-	public function decryptData($sessionKey, $encryptedData, $iv, &$data){
+	public function decryptData($sessionKey, $encryptedData, $iv){
 		$this->sessionKey = $sessionKey;
 		$aesKey=base64_decode($this->sessionKey);
 
@@ -19,20 +15,9 @@ class WechatAppApiClient extends WechatApiClient {
 
 		$aesCipher=base64_decode($encryptedData);
 
+		//FIXME 有时这里会返回乱码
 		$result = $this->decrypt($aesKey,$aesCipher,$aesIV);
-
-		if ($result[0] != 0) {
-			return $result[0];
-		}
-
-		$dataObj=json_decode( $result[1] );
-
-		if( $dataObj->watermark->appid != $this->appid )
-		{
-			throw new Exception('wrong');
-		}
-		$data = $result[1];
-		return true;
+		return (string)$result;
 	}
 
 	public function decrypt($aesKey, $aesCipher, $aesIV ) {
