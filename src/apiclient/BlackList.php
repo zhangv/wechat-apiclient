@@ -7,7 +7,6 @@ trait BlackList{
 	/**
 	 * 获取公众号的黑名单列表
 	 * @param $begin_openid
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function getBlacklistMembers($begin_openid){
@@ -19,7 +18,6 @@ trait BlackList{
 	/**
 	 * 拉黑用户
 	 * @param $openid_list
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function batchBlacklistMembers($openid_list){
@@ -31,7 +29,6 @@ trait BlackList{
 	/**
 	 * 取消拉黑用户
 	 * @param $openid_list
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function batchUnBlacklistMembers($openid_list){

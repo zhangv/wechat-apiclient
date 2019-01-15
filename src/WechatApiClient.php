@@ -37,6 +37,7 @@ class WechatApiClient {
 	private $cacheProvider;
 	/** @var  HttpClient */
 	private $httpClient;
+	private $https = false;
 
 	public function __construct($conf){
 		$this->config = $conf;
@@ -50,6 +51,10 @@ class WechatApiClient {
 
 	public function setCacheProvider($cacheProvider){
 		$this->cacheProvider = $cacheProvider;
+	}
+
+	public function setHttps($https){
+		$this->https = $https;
 	}
 
 	public function getCacheProvider(){
@@ -67,6 +72,7 @@ class WechatApiClient {
 		}
 
 		if(!$accesstoken || $refresh === true){
+
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
@@ -114,9 +120,17 @@ class WechatApiClient {
 
 	private function get($url,$raw = false){
 		$result = $this->httpClient->get($url);
+		if(!$result){
+			if($this->httpClient->getError() !== ''){
+				throw new Exception($this->httpClient->getError());
+			}else
+				throw new Exception("Null result, with URL:[$url]");
+		}
+
 		if($raw === true){
 			return $result;
 		}
+
 		$json = $this->processResult($result);
 		return $json;
 	}
@@ -148,6 +162,7 @@ class WechatApiClient {
 
 	private function processResult($result){
 		$json = json_decode($result);
+
 		if($json === null){
 			throw new Exception("Bad formatted JSON - {$result}");
 		}
@@ -206,6 +221,40 @@ class WechatApiClient {
 			}
 		}
 		return $ticket;
+	}
+
+	public function getSignPackageByURL($url = null){
+		$jsapiTicket = $this->getTicket();
+		if(!$url){
+			$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+			$url = "$protocol$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		}
+		$timestamp = time();
+		$nonceStr = $this->createNonceStr();
+
+		// 这里参数的顺序要按照 key 值 ASCII 码升序排序
+		$string = "jsapi_ticket=$jsapiTicket&noncestr=$nonceStr&timestamp=$timestamp&url=$url";
+
+		$signature = sha1($string);
+
+		$signPackage = array(
+			"appId" => $this->config['appid'],
+			"nonceStr" => $nonceStr,
+			"timestamp" => $timestamp,
+			"url" => $url,
+			"signature" => $signature,
+			"rawString" => $string
+		);
+		return $signPackage;
+	}
+
+	private function createNonceStr($length = 16) {
+		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		$str = "";
+		for ($i = 0; $i < $length; $i++) {
+			$str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+		}
+		return $str;
 	}
 
 }

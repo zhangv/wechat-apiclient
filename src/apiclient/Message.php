@@ -39,7 +39,6 @@ trait Message{
 	 * @param $message
 	 * @param $msgtype
 	 * @param null $towxname
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function massPreview($touser,$message,$msgtype,$towxname = null){
@@ -59,7 +58,6 @@ trait Message{
 	/**
 	 * 查询群发消息发送状态
 	 * @param $msgid
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function getMassMessage($msgid){
