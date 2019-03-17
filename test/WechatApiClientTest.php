@@ -2,6 +2,7 @@
 
 use zhangv\wechat\WechatApiClient;
 use zhangv\wechat\apiclient\util\HttpClient;
+use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
 use PHPUnit\Framework\TestCase;
 
 class WechatApiClientTest extends TestCase{
@@ -13,6 +14,8 @@ class WechatApiClientTest extends TestCase{
 		$config = ['appid'=>'appid','appsecret'=>'secret'];
 		$this->api = new WechatApiClient($config);
 		$this->httpClient = $this->createMock(HttpClient::class);
+		$cacheProvider = new JsonFileCacheProvider(__DIR__);
+		$this->api->setCacheProvider($cacheProvider);
 	}
 
 	/** @test */
