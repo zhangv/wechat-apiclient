@@ -2,6 +2,9 @@
 
 namespace zhangv\wechat\apiclient;
 
+use \CURLFile;
+use zhangv\wechat\WechatApiClient;
+
 trait Media{
 
 	public function downloadMedia($media){//not test
@@ -41,7 +44,6 @@ trait Media{
 	/**
 	 * 获取临时素材
 	 * @param $mediaid
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function getMedia($mediaid){
@@ -54,12 +56,12 @@ trait Media{
 	/**
 	 * 上传图文消息内的图片获取URL
 	 * @param $mediapath
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function uploadImage($mediapath){
 		$file = realpath($mediapath); //要上传的文件
-		$fields['media'] = new CURLFile($file);
+//		$fields['media'] = new CURLFile($file);
+		$fields['media'] = "@$file";
 		$url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg";
 		$r=$this->post($url,$fields);
 		return $r;
@@ -68,7 +70,6 @@ trait Media{
 	/**
 	 * 新增永久图文素材
 	 * @param $articles
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function addNews($articles){
@@ -79,7 +80,6 @@ trait Media{
 	/**
 	 * 修改永久图文素材
 	 * @param $article
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function updateNews($mediaid,$index,$article){
@@ -94,12 +94,10 @@ trait Media{
 
 	/**
 	 * 获取素材总数
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function getMaterialCount(){
-		$accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token=$accesstoken";
+		$url = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount";
 		return $this->get($url);
 	}
 
@@ -107,14 +105,31 @@ trait Media{
 	 * 新增其他类型永久素材
 	 * @param $type
 	 * @param $mediapath
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function addMaterial($type,$mediapath,$accesstoken = null,$videotitle = null,$videointro = null){
-		if(!$accesstoken) $accesstoken = $this->getAccessToken();
+	public function addMaterial($type,$mediapath,$videotitle = null,$videointro = null){
+		$url = "https://api.weixin.qq.com/cgi-bin/material/add_material";
+		if(class_exists('CURLFile')){
+			$data = array('media' => new CURLFile(realpath($mediapath)));
+		}else{
+			$data = array('media'=>'@'.$mediapath);
+		}
+		if($type == WechatApiClient::MEDIATYPE_VIDEO){//在上传视频素材时需要POST另一个表单，id为description，包含素材的描述信息，内容格式为JSON
+			$data['description'] = json_encode(['title'=>$videotitle,'introduction'=>$videointro]);
+		}
+		return $this->post($url,$data,false,['type' => $type]);
+	}
+
+	/**
+	 * 新增其他类型永久素材
+	 * @param $type
+	 * @param $mediapath
+	 * @return mixed
+	 */
+	public function addMaterial0($type,$mediapath,$videotitle = null,$videointro = null){
 		$url = "https://api.weixin.qq.com/cgi-bin/material/add_material";
 		$file = realpath($mediapath); //要上传的文件
-		$fields['media'] = new CURLFile($file);
+		$fields['media'] = new \CURLFile($file);
 		if($type == WechatApiClient::MEDIATYPE_VIDEO){//在上传视频素材时需要POST另一个表单，id为description，包含素材的描述信息，内容格式为JSON
 			$fields['description'] = json_encode(['title'=>$videotitle,'introduction'=>$videointro]);
 		}
@@ -136,7 +151,6 @@ trait Media{
 	/**
 	 * 删除永久素材
 	 * @param $mediaid
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function delMaterial($mediaid){
@@ -150,7 +164,6 @@ trait Media{
 	 * @param $type
 	 * @param $offset
 	 * @param $count
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function batchGetMaterial($type,$offset,$count){

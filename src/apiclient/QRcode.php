@@ -25,7 +25,7 @@ trait QRcode{
 		}elseif($type == WechatApiClient::QRTYPE_FOREVER_STR){
 			$params['action_info']['scene']['scene_str'] = $sceneid;
 		}
-		return $this->post2("https://api.weixin.qq.com/cgi-bin/qrcode/create",json_encode($params,JSON_UNESCAPED_UNICODE));
+		return $this->post("https://api.weixin.qq.com/cgi-bin/qrcode/create",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
 	/**

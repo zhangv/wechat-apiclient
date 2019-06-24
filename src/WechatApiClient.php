@@ -41,7 +41,9 @@ class WechatApiClient {
 
 	public function __construct($conf){
 		$this->config = $conf;
-		$this->httpClient = new HttpClient(3);//the menu create require more than 1 second
+		$this->httpClient = new HttpClient(4);
+		//the menu create require more than 1 second
+		//https://api.weixin.qq.com/card/membercard/activatetempinfo/get not get info within 3 seconds
 		$this->cacheProvider = new JsonFileCacheProvider();
 	}
 
@@ -72,11 +74,10 @@ class WechatApiClient {
 		}
 
 		if(!$accesstoken || $refresh === true){
-
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-			$r =$this->get($url);
+			$r =$this->get($url,false,false);
 			if($r){
 				if(!empty($r->access_token)){
 					$accesstoken = $r->access_token;
@@ -118,7 +119,19 @@ class WechatApiClient {
 		return $this->post("https://api.weixin.qq.com/cgi-bin/shorturl",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
-	private function get($url,$raw = false){
+	private function get($url,$raw = false,$tokenrequired = true){
+		if($tokenrequired === true){
+			$components = parse_url($url);
+			$arr = [];
+			if(!empty($components['query'])){
+				parse_str($components['query'],$arr);
+			}
+			if(empty($arr['access_token'])){
+				$at = $this->getAccessToken();
+				$arr['access_token'] = $at;
+			}
+			$url = $components['scheme'].'://'.$components['host'].$components['path']."?".http_build_query($arr);
+		}
 		$result = $this->httpClient->get($url);
 		if(!$result){
 			if($this->httpClient->getError() !== ''){
@@ -131,7 +144,13 @@ class WechatApiClient {
 			return $result;
 		}
 
-		$json = $this->processResult($result);
+		try{
+			$json = $this->processResult($result);
+		}catch (Exception $e){
+			error_log($url);
+			error_log(print_r($e,true));
+			throw $e;
+		}
 		return $json;
 	}
 
@@ -141,11 +160,12 @@ class WechatApiClient {
 		$url2 = $url . "?".http_build_query($querydata);
 		$result = $this->httpClient->post($url2,$params);
 		if(!$result){
-			$paramstr = print_r($params,true);
 			if($this->httpClient->getError() !== ''){
 				throw new Exception($this->httpClient->getError());
-			}else
+			}else{
+				$paramstr = print_r($params,true);
 				throw new Exception("Null result, with URL:[$url2],POSTFIELDS = [$paramstr]");
+			}
 		}
 
 		$json = json_decode($result);
