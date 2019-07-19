@@ -9,41 +9,18 @@ class WechatAppApiClient extends WechatApiClient {
 	public function decryptData($sessionKey, $encryptedData, $iv){
 		$this->sessionKey = $sessionKey;
 		$aesKey=base64_decode($this->sessionKey);
-
-
 		$aesIV=base64_decode($iv);
-
-		$aesCipher=base64_decode($encryptedData);
-
-		//FIXME 有时这里会返回乱码
-		$result = $this->decrypt($aesKey,$aesCipher,$aesIV);
-		return (string)$result;
-	}
-
-	public function decrypt($aesKey, $aesCipher, $aesIV ) {
 		try {
-
-			$module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
-
-			mcrypt_generic_init($module, $aesKey, $aesIV);
-
-			//解密
-			$decrypted = mdecrypt_generic($module, $aesCipher);
-			mcrypt_generic_deinit($module);
-			mcrypt_module_close($module);
+			$decrypted = openssl_decrypt(base64_decode($encryptedData), 'aes-128-cbc', $aesKey, OPENSSL_RAW_DATA, $aesIV);
 		} catch (Exception $e) {
 			throw $e;
 		}
-
-
 		try {
-			//去除补位字符
 			$result = $this->decode($decrypted);
-
 		} catch (Exception $e) {
 			throw $e;
 		}
-		return array(0, $result);
+		return $result;
 	}
 
 	/**
