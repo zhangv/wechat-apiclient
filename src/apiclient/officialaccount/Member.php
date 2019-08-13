@@ -1,7 +1,7 @@
 <?php
-namespace zhangv\wechat\apiclient;
-
-trait Member{
+namespace zhangv\wechat\apiclient\officialaccount;
+use zhangv\wechat\WechatApiClient;
+class Member extends WechatApiClient {
 
 	/**
 	 * 拉取会员信息（积分查询）

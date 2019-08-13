@@ -1,10 +1,10 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 
 use  zhangv\wechat\WechatApiClient;
 
-trait QRcode{
+class QRcode extends WechatApiClient {
 
 	/**
 	 * 获取二维码ticket

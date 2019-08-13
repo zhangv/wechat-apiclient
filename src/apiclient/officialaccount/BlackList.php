@@ -1,8 +1,10 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 
-trait BlackList{
+use zhangv\wechat\WechatApiClient;
+
+class BlackList extends WechatApiClient {
 
 	/**
 	 * 获取公众号的黑名单列表

@@ -8,17 +8,23 @@ class JsonFileCacheProvider implements CacheProvider{
 	private $cacheDir = null;
 
 	public function __construct($cacheDir = null){
-		if(!$cacheDir) $this->cacheDir = __DIR__;
+		if(!$cacheDir) {
+			$this->cacheDir = __DIR__;
+			if(!is_writable($this->cacheDir)){
+				$this->cacheDir = '/tmp';
+			}
+		}
 		else $this->cacheDir = $cacheDir;
 	}
 
-	public function set($key,$json,$expireAt = null){
-		$data = json_decode($json);
+	public function set($key,$jsonobj,$expireAt = null){
+		$data = $jsonobj;
 		$data->expires_at = $expireAt;
 		$file = "{$this->cacheDir}/{$key}.json";
-		$fp = fopen($file, "w");
-		fwrite($fp, json_encode($data));
-		if ($fp) fclose($fp);
+		if($fp = @fopen($file, "w")){
+			fwrite($fp, json_encode($data));
+			fclose($fp);
+		}
 	}
 
 	public function get($key){
@@ -31,7 +37,7 @@ class JsonFileCacheProvider implements CacheProvider{
 				$this->clear($key);
 			}
 		}
-		return $cache?json_encode($cache):null;
+		return $cache;
 	}
 
 	public function clear($key){

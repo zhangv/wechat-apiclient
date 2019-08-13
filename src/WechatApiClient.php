@@ -7,17 +7,22 @@ use zhangv\wechat\apiclient\cache\JsonFileCacheProvider;
 use zhangv\wechat\apiclient\util\HttpClient;
 
 
+/**
+ * Class WechatApiClient
+ * @package zhangv\wechat
+ * @author zhangv
+ * @license MIT
+ *
+ * @method static apiclient\officialaccount\Media       Media(array $config)
+ * @method static apiclient\officialaccount\Menu     Menu(array $config)
+ * @method static apiclient\officialaccount\Message     Message(array $config)
+ * @method static apiclient\officialaccount\QRcode      QRcode(array $config)
+ * @method static apiclient\officialaccount\BlackList    BlackList(array $config)
+ * @method static apiclient\officialaccount\Comment     Comment(array $config)
+ * @method static apiclient\officialaccount\Member    Member(array $config)
+ * @method static apiclient\officialaccount\UserInfo   UserInfo(array $config)
+ */
 class WechatApiClient {
-
-	use apiclient\Media;
-	use apiclient\Menu;
-	use apiclient\Message;
-	use apiclient\QRcode;
-	use apiclient\BlackList;
-	use apiclient\Comment;
-	use apiclient\UserInfo;
-	use apiclient\Member;
-	use apiclient\Wxa;
 
 	const MSGTYPE_MPNEWS = 'mpnews',MSGTYPE_TEXT = 'text',MSGTYPE_MPVIDEO = 'mpvideo',MSGTYPE_VOICE = 'voice',MSGTYPE_IMAGE = 'image',MSGTYPE_WXCARD = 'wxcard';
 	const MEDIATYPE_IMAGE = 'image',MEDIATYPE_VOICE = 'voice',MEDIATYPE_VIDEO = 'video',MEDIATYPE_THUMB = 'thumb';
@@ -45,6 +50,26 @@ class WechatApiClient {
 		//the menu create require more than 1 second
 		//https://api.weixin.qq.com/card/membercard/activatetempinfo/get not get info within 3 seconds
 		$this->cacheProvider = new JsonFileCacheProvider();
+	}
+
+	/**
+	 * @param string $name
+	 * @param array  $config
+	 *
+	 * @return mixed
+	 */
+	public static function __callStatic($name, $config) {
+		return self::load($name, ...$config);
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $config
+	 * @return mixed
+	 */
+	private static function load($name, $config) {
+		$service = __NAMESPACE__ . "\\apiclient\\officialaccount\\{$name}";
+		return new $service($config);
 	}
 
 	public function setHttpClient($httpClient){
@@ -119,7 +144,7 @@ class WechatApiClient {
 		return $this->post("https://api.weixin.qq.com/cgi-bin/shorturl",json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
 
-	private function get($url,$raw = false,$tokenrequired = true){
+	protected function get($url,$raw = false,$tokenrequired = true){
 		if($tokenrequired === true){
 			$components = parse_url($url);
 			$arr = [];
@@ -154,7 +179,7 @@ class WechatApiClient {
 		return $json;
 	}
 
-	private function post($url, $params, $raw = false, $querydata = []) {
+	protected function post($url, $params, $raw = false, $querydata = []) {
 		$at = $this->getAccessToken();
 		$querydata['access_token'] = $at;
 		$url2 = $url . "?".http_build_query($querydata);

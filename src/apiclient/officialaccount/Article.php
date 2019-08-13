@@ -1,6 +1,6 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 
 class Article{
 	public $title,$thumb_media_id,$author,$digest,$show_cover_pic,$content,$content_source_url;

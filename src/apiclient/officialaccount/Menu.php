@@ -1,8 +1,10 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 
-trait Menu{
+use zhangv\wechat\WechatApiClient;
+
+class Menu extends WechatApiClient {
 	/**
 	 * 更新菜单
 	 * @param $menu
@@ -17,8 +19,7 @@ trait Menu{
 	 * @return mixed
 	 */
 	public function getMenu(){
-		$accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=$accesstoken";
+		$url = "https://api.weixin.qq.com/cgi-bin/menu/get";
 		return $this->get($url);
 	}
 

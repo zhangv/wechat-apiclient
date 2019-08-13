@@ -1,15 +1,14 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 
 use \CURLFile;
 use zhangv\wechat\WechatApiClient;
 
-trait Media{
+class Media extends WechatApiClient{
 
 	public function downloadMedia($media){//not test
-		$accesstoken = $this->getAccessToken();
-		$url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=$accesstoken&media_id=$media";
+		$url = "http://file.api.weixin.qq.com/cgi-bin/media/get?media_id=$media";
 		$output=$this->get($url);
 		$package = $output[0];
 		$httpinfo = $output[1];
@@ -18,7 +17,7 @@ trait Media{
 		preg_match('/\w\/(\w+)/i', $media["content_type"], $extmatches);
 		$fileExt = $extmatches[1];
 		$filename = time().rand(100,999).".{$fileExt}";
-		$dirname = TMP_PATH;
+		$dirname = '/tmp/wechatapiclient';
 		if(!file_exists($dirname)){
 			mkdir($dirname,0777,true);
 		}
@@ -47,8 +46,7 @@ trait Media{
 	 * @return mixed
 	 */
 	public function getMedia($mediaid){
-		$accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$accesstoken&media_id=$mediaid";
+		$url = "https://api.weixin.qq.com/cgi-bin/media/get?media_id=$mediaid";
 		$r=$this->get($url);
 		return $r;
 	}

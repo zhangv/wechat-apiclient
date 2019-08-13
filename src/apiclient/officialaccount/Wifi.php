@@ -1,8 +1,8 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
-
-trait Wifi{
+namespace zhangv\wechat\apiclient\officialaccount;
+use zhangv\wechat\WechatApiClient;
+class Wifi extends WechatApiClient {
 	
 	/**
 	 * 获取Wi-Fi门店列表

@@ -1,9 +1,9 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
+namespace zhangv\wechat\apiclient\officialaccount;
 use zhangv\wechat\WechatApiClient;
 
-trait Comment{
+class Comment extends WechatApiClient {
 	/**
 	 * 打开已群发文章评论
 	 * @param $msg_data_id

@@ -1,8 +1,8 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
-
-trait Message{
+namespace zhangv\wechat\apiclient\officialaccount;
+use zhangv\wechat\WechatApiClient;
+class Message extends WechatApiClient {
 
 	public function sendMsg($touser,$templateid,$url,$data,$topcolor = '#FF0000'){
 		$params = [

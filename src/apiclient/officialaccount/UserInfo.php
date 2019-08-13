@@ -1,8 +1,8 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
-
-trait UserInfo{
+namespace zhangv\wechat\apiclient\officialaccount;
+use zhangv\wechat\WechatApiClient;
+class UserInfo extends WechatApiClient {
 
 	/**
 	 * 获取用户授权信息，即使用户没有关注，也可以获得用户信息（因为oauth授权）
@@ -21,9 +21,8 @@ trait UserInfo{
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getUserBaseInfo($openid){//获取用户基本信息
-		$accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$accesstoken&openid=$openid&lang=zh_CN";
+	public function getUserBaseInfo($openid){
+		$url = "https://api.weixin.qq.com/cgi-bin/user/info?openid=$openid&lang=zh_CN";
 		return $this->get($url);
 	}
 
@@ -51,9 +50,8 @@ trait UserInfo{
 	 * @return mixed
 	 */
 	public function getUser($next_openid){
-		$accesstoken = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$accesstoken";
-		if($next_openid) $url .= "&next_openid=$next_openid";
+		$url = "https://api.weixin.qq.com/cgi-bin/user/get";
+		if($next_openid) $url .= "?next_openid=$next_openid";
 		return $this->get($url);
 	}
 

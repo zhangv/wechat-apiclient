@@ -1,13 +1,12 @@
 <?php
 
-namespace zhangv\wechat\apiclient;
-
-trait Wxa{
+namespace zhangv\wechat\apiclient\applet;
+use zhangv\wechat\WechatApiClient;
+class Security extends WechatApiClient {
 	
 	/**
 	 * 文本安全内容检测接口
 	 * @param $content
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function msgSecCheck($content){
@@ -19,7 +18,6 @@ trait Wxa{
 	/**
 	 * 图片安全内容检测接口
 	 * @param $imgpath
-	 * @param null $accesstoken
 	 * @return mixed
 	 */
 	public function imgSecCheck($imgpath){
@@ -27,6 +25,10 @@ trait Wxa{
 		$file = realpath($imgpath); //要上传的文件
 		$params['media'] = new CURLFile($file);
 		return $this->post($url,$params);
+	}
+
+	public function mediaCheckAsync($imgpath){
+
 	}
 
 }
