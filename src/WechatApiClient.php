@@ -93,7 +93,7 @@ class WechatApiClient {
 		$accesstoken = null;
 		if($this->cacheProvider){
 			$cached = $this->cacheProvider->get($key);
-			if($cached && $cached = json_decode($cached)) {
+			if($cached) {
 				$accesstoken = $cached->access_token;
 			}
 		}
@@ -108,7 +108,7 @@ class WechatApiClient {
 					$accesstoken = $r->access_token;
 					if($this->cacheProvider) {
 						$expires_at = time() + $r->expires_in;
-						$this->cacheProvider->set($key, json_encode($r), $expires_at);
+						$this->cacheProvider->set($key, $r, $expires_at);
 					}
 				}else{
 					throw new Exception("Access token missing in ".print_r(json_encode($r),true));
@@ -242,7 +242,7 @@ class WechatApiClient {
 		$key = "wechatapiclient:ticket:{$type}";
 		if($this->cacheProvider){
 			$cached = $this->cacheProvider->get($key);
-			if($cached && $cached = json_decode($cached)){
+			if($cached){
 				$ticket = $cached->ticket;
 			}
 		}
@@ -256,7 +256,7 @@ class WechatApiClient {
 					$ticket = $r->ticket;
 					if($this->cacheProvider) {
 						$expires_at = time() + $r->expires_in;
-						$this->cacheProvider->set($key, json_encode($r), $expires_at);
+						$this->cacheProvider->set($key, $r, $expires_at);
 					}
 				}else{
 					throw new Exception("Ticket missing in: ".print_r(json_encode($r),true));

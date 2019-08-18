@@ -28,7 +28,7 @@ class Security extends WechatApiClient {
 	}
 
 	public function mediaCheckAsync($imgpath){
-
+//TODO
 	}
 
 }

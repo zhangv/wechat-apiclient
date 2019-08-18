@@ -112,7 +112,7 @@ class WechatAppApiClient {
 		return $accesstoken;
 	}
 
-	private function get($url,$raw = false,$tokenrequired = true){
+	protected function get($url,$raw = false,$tokenrequired = true){
 		if($tokenrequired === true){
 			$components = parse_url($url);
 			$arr = [];

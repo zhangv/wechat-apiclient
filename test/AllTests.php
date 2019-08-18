@@ -5,7 +5,7 @@ class AllTests extends TestSuite {
 
 	public static function suite() {
 		$suite = new TestSuite();
-		$tests = ['WechatApiClientTest','apiclient','util'];
+		$tests = ['WechatApiClientTest','apiclient','util','cache'];
 		foreach($tests as $t){
 			$path = __DIR__ . '/'.$t;
 			if(is_dir($path)){

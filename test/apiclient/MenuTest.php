@@ -11,7 +11,7 @@ class MenuTest extends TestCase{
 	private $httpClient = null;
 	public function setUp(){
 		$config = ['appid'=>'appid','appsecret'=>'secret'];
-		$this->api = new WechatApiClient($config);
+		$this->api = WechatApiClient::Menu($config);
 		$this->httpClient = $this->createMock(HttpClient::class);
 	}
 
