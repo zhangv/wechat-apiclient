@@ -42,13 +42,16 @@ class WechatApiClient {
 	private $cacheProvider;
 	/** @var  HttpClient */
 	private $httpClient;
+	const DEFAULT_TIMEOUT = 4;
+
 	private $https = false;
 
 	public function __construct($conf){
 		$this->config = $conf;
-		$this->httpClient = new HttpClient(4);
+		$timeout = (empty($conf['timeout']))?self::DEFAULT_TIMEOUT:$conf['timeout'];
+		$this->httpClient = new HttpClient($timeout);
 		//the menu create require more than 1 second
-		//https://api.weixin.qq.com/card/membercard/activatetempinfo/get not get info within 3 seconds
+		//https://api.weixin.qq.com/card/membercard/activatetempinfo/get not get info within 3-4 seconds
 		$this->cacheProvider = new JsonFileCacheProvider();
 	}
 

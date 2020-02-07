@@ -30,6 +30,8 @@ class HttpClientTest extends TestCase{
 	public function testTimeout(){
 		$c = new HttpClient(0.01,2);
 		$r = $c->get("{$this->endPoint}/delay/1");//timeout
+		var_dump($c->getError());
+		var_dump($c->getInfo());
 		$this->assertEquals(28,$c->getErrorNo());
 		$this->assertEquals(2,$c->getTried());
 

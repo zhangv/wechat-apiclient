@@ -287,8 +287,9 @@ class Member extends WechatApiClient {
 	/**
 	 * 更新会员卡配置
 	 * @param $cardid
-	 * @param null $accesstoken
+	 * @param array $memberCard
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function updateMemberCard($cardid,$memberCard){
 		$updatables = [
@@ -297,7 +298,7 @@ class Member extends WechatApiClient {
 			'increase_bonus','max_increase_bonus','init_increase_bonus', 'cost_bonus_unit','reduce_money','least_money_to_use_bonus',
 			'max_reduce_bonus','discount',
 			'wx_activate_after_submit','wx_activate_after_submit_url' //这两个字段文档没写，但是是可以修改的 - 只能通过api修改
-			];
+		];
 
 		$baseinfo_updatables = [
 			'logo_url','notice','description','service_phone',
@@ -308,19 +309,22 @@ class Member extends WechatApiClient {
 		];
 		$updates = [];
 		foreach($updatables as $updatable){
-			if(empty($memberCard->$updatable) || !$memberCard->$updatable) continue;
-			$updates[$updatable] = $memberCard->$updatable;
+			if(!isset($memberCard[$updatable])) continue;
+			$updates[$updatable] = $memberCard[$updatable];
 		}
-		$baseinfo_updates = [];
-		foreach($baseinfo_updatables as $updatable){
-			if(empty($memberCard->base_info->$updatable) || !$memberCard->base_info->$updatable) continue;
-			$baseinfo_updates[$updatable] = $memberCard->base_info->$updatable;
+		if(!empty($memberCard['base_info'])){
+			$baseinfo_updates = [];
+			foreach($baseinfo_updatables as $updatable){
+				if(!isset($memberCard['base_info'][$updatable])) continue;
+				$baseinfo_updates[$updatable] = $memberCard['base_info'][$updatable];
+			}
+			$updates['base_info'] = $baseinfo_updates;
 		}
-		$updates['base_info'] = $baseinfo_updates;
 		$url = "https://api.weixin.qq.com/card/update";
 		$params = ['card_id' => $cardid,'member_card'=>$updates];
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE));
 	}
+
 	/**
 	 * 更新会员卡开卡跳转方式
 	 * @param $cardid
