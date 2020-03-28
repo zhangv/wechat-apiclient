@@ -168,6 +168,13 @@ class WechatApiClient {
 				throw new Exception("Null result, with URL:[$url]");
 		}
 
+		$json = json_decode($result);
+		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
+			$atnew = $this->getAccessToken(true);
+			$querydata['access_token'] = $atnew;
+			$result = $this->httpClient->get($url);
+		}
+
 		if($raw === true){
 			return $result;
 		}
