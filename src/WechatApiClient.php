@@ -169,7 +169,8 @@ class WechatApiClient {
 		}
 
 		$json = json_decode($result);
-		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
+		if(!empty($json->errcode) &&
+			($json->errcode === 40001 || $json->errcode == '40001')){//try again and update the cached accesstoken
 			$atnew = $this->getAccessToken(true);
 			$querydata['access_token'] = $atnew;
 			$url2 = $url . "?".http_build_query($querydata);
@@ -205,7 +206,8 @@ class WechatApiClient {
 		}
 
 		$json = json_decode($result);
-		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
+		if(!empty($json->errcode) &&
+			($json->errcode === 40001 || $json->errcode == '40001')){//try again and update the cached accesstoken
 			$atnew = $this->getAccessToken(true);
 			$querydata['access_token'] = $atnew;
 			$url2 = $url . "?".http_build_query($querydata);
