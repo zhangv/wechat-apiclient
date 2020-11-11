@@ -99,7 +99,7 @@ class WechatAppApiClient {
 					$accesstoken = $r->access_token;
 					if($this->cacheProvider) {
 						$expires_at = time() + $r->expires_in;
-						$this->cacheProvider->set($key, json_encode($r), $expires_at);
+						$this->cacheProvider->set($key, $r, $expires_at);
 					}
 				}else{
 					throw new Exception("Access token missing in ".print_r(json_encode($r),true));
@@ -133,6 +133,15 @@ class WechatAppApiClient {
 				throw new Exception("Null result, with URL:[$url]");
 		}
 
+		$json = json_decode($result);
+		if(!empty($json->errcode) &&
+			($json->errcode === 40001 || $json->errcode == '40001')){//try again and update the cached accesstoken
+			$atnew = $this->getAccessToken(true);
+			$querydata['access_token'] = $atnew;
+			$url2 = $url . "?".http_build_query($querydata);
+			$result = $this->httpClient->get($url2);
+		}
+
 		if($raw === true){
 			return $result;
 		}
@@ -152,9 +161,6 @@ class WechatAppApiClient {
 		$querydata['access_token'] = $at;
 		$url2 = $url . "?".http_build_query($querydata);
 		$result = $this->httpClient->post($url2,$params);
-		error_log('###');
-		error_log(print_r($params,true));
-		error_log('###');
 		if(!$result){
 			if($this->httpClient->getError() !== ''){
 				throw new Exception($this->httpClient->getError());
@@ -165,13 +171,24 @@ class WechatAppApiClient {
 		}
 
 		$json = json_decode($result);
-		if(!empty($json->errcode) && $json->errcode === 40001){//try again and update the cached accesstoken
-			$atnew = $this->getAccessToken(true);
-			$querydata['access_token'] = $atnew;
-			$url2 = $url . "?".http_build_query($querydata);
-			$result = $this->httpClient->post($url2,$params);
+		if(!$json){
+			return $result;
+		}else{
+			if(!empty($json->errcode)){
+				if($json->errcode === 40001){//try again and update the cached accesstoken
+					$atnew = $this->getAccessToken(true);
+					$querydata['access_token'] = $atnew;
+					$url2 = $url . "?".http_build_query($querydata);
+					$result = $this->httpClient->post($url2,$params);
+				}else{
+					throw new Exception($json->errmsg);
+				}
+			}
+
+			if($raw === true) return $result;
 		}
-		if($raw === true) return $result;
+
+
 		$json = $this->processResult($result);
 		return $json;
 	}

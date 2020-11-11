@@ -28,7 +28,7 @@ class WxaCode extends WechatAppApiClient {
 	public function getUnlimited($scene,$page,$width = 430,$auto_color = false,$line_color =  ['r'=>0,'g'=>0,'b' => 0], $is_hyaline = false){
 		$url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit";
 		$params = ['scene' => $scene, 'page' => $page,'width' => $width,'auto_color' => $auto_color, 'line_color' => $line_color, 'is_hyaline' => $is_hyaline];
-		error_log(print_r($params,true));
+//		error_log(print_r($params,true));
 		return $this->post($url,json_encode($params,JSON_UNESCAPED_UNICODE),true);
 	}
 

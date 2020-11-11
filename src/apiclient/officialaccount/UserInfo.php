@@ -49,7 +49,7 @@ class UserInfo extends WechatApiClient {
 	 * @param null $accesstoken
 	 * @return mixed
 	 */
-	public function getUser($next_openid){
+	public function getUserList($next_openid){
 		$url = "https://api.weixin.qq.com/cgi-bin/user/get";
 		if($next_openid) $url .= "?next_openid=$next_openid";
 		return $this->get($url);
