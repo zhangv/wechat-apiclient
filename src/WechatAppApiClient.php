@@ -84,7 +84,7 @@ class WechatAppApiClient {
 		$accesstoken = null;
 		if($this->cacheProvider){
 			$cached = $this->cacheProvider->get($key);
-			if($cached && $cached = json_decode($cached)) {
+			if($cached) {
 				$accesstoken = $cached->access_token;
 			}
 		}

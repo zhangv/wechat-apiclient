@@ -46,7 +46,6 @@ class JsonFileCacheProvider implements CacheProvider{
 			$cache = json_decode($raw);
 			if(!$cache) { //corrupted json format
 				$this->clear($key);
-//				var_dump($cache);die;
 			}else{
 				if($cache->expires_at < time()){
 					$cache = null;
