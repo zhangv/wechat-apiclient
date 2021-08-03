@@ -25,6 +25,7 @@ use zhangv\wechat\apiclient\util\HttpClient;
  * @method static apiclient\applet\UniformMessage   UniformMessage(array $config)
  * @method static apiclient\applet\UpdatableMessage   UpdatableMessage(array $config)
  * @method static apiclient\applet\WxaCode   WxaCode(array $config)
+ * @method static apiclient\applet\URL   URL(array $config)
  */
 class WechatAppApiClient {
 	private $sessionKey;

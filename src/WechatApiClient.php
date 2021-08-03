@@ -184,8 +184,8 @@ class WechatApiClient {
 		try{
 			$json = $this->processResult($result);
 		}catch (Exception $e){
-			error_log($url);
-			error_log(print_r($e,true));
+//			error_log($url);
+//			error_log(print_r($e,true));
 			throw $e;
 		}
 		return $json;
