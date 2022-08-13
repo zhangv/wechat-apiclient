@@ -1,6 +1,7 @@
 <?php
 
 namespace zhangv\wechat;
+
 use \Exception;
 use zhangv\wechat\apiclient\applet\PluginManager;
 use zhangv\wechat\apiclient\cache\CacheProvider;
@@ -9,7 +10,6 @@ use zhangv\wechat\apiclient\util\Crypto;
 use zhangv\wechat\apiclient\util\HttpClient;
 
 /**
- * Class WechatAppApiClient
  * @package zhangv\wechat
  * @author zhangv
  * @license MIT
@@ -58,100 +58,102 @@ class WechatAppApiClient {
 	}
 
 
-	public function __construct($conf){
+	public function __construct($conf) {
 		$this->config = $conf;
 		$this->httpClient = new HttpClient(2);
 		$this->cacheProvider = new JsonFileCacheProvider();
 	}
 
-	public function setHttpClient($httpClient){
+	public function setHttpClient($httpClient) {
 		$this->httpClient = $httpClient;
 	}
 
-	public function setCacheProvider($cacheProvider){
+	public function setCacheProvider($cacheProvider) {
 		$this->cacheProvider = $cacheProvider;
 	}
 
-	public function setHttps($https){
+	public function setHttps($https) {
 		$this->https = $https;
 	}
 
-	public function getCacheProvider(){
+	public function getCacheProvider() {
 		return $this->cacheProvider;
 	}
 
-	public function getAccessToken($refresh = false){
+	public function getAccessToken($refresh = false) {
 		$key = self::CACHEKEY_ACCESSTOKEN;
 		$accesstoken = null;
-		if($this->cacheProvider){
+		if ($this->cacheProvider) {
 			$cached = $this->cacheProvider->get($key);
-			if($cached) {
+			if ($cached) {
 				$accesstoken = $cached->access_token;
 			}
 		}
 
-		if(!$accesstoken || $refresh === true){
+		if (!$accesstoken || $refresh === true) {
 			$appid = $this->config['appid'];
 			$appsecret = $this->config['appsecret'];
 			$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-			$r =$this->get($url,false,false);
-			if($r){
-				if(!empty($r->access_token)){
+			$r = $this->get($url, false, false);
+			if ($r) {
+				if (!empty($r->access_token)) {
 					$accesstoken = $r->access_token;
-					if($this->cacheProvider) {
+					if ($this->cacheProvider) {
 						$expires_at = time() + $r->expires_in;
 						$this->cacheProvider->set($key, $r, $expires_at);
 					}
-				}else{
-					throw new Exception("Access token missing in ".print_r(json_encode($r),true));
+				} else {
+					throw new Exception("Access token missing in " . print_r(json_encode($r), true));
 				}
-			}else{
-				throw new Exception("Not a valid json: ".print_r(json_encode($r),true));
+			} else {
+				throw new Exception("Not a valid json: " . print_r(json_encode($r), true));
 			}
 		}
 
 		return $accesstoken;
 	}
 
-	protected function get($url,$raw = false,$tokenrequired = true){
-		if($tokenrequired === true){
+	protected function get($url, $raw = false, $tokenrequired = true) {
+		if ($tokenrequired === true) {
 			$components = parse_url($url);
 			$arr = [];
-			if(!empty($components['query'])){
-				parse_str($components['query'],$arr);
+			if (!empty($components['query'])) {
+				parse_str($components['query'], $arr);
 			}
-			if(empty($arr['access_token'])){
+			if (empty($arr['access_token'])) {
 				$at = $this->getAccessToken();
 				$arr['access_token'] = $at;
 			}
-			$url = $components['scheme'].'://'.$components['host'].$components['path']."?".http_build_query($arr);
+			$url = $components['scheme'] . '://' . $components['host'] . $components['path'] . "?" . http_build_query($arr);
 		}
 		$result = $this->httpClient->get($url);
-		if(!$result){
-			if($this->httpClient->getError() !== ''){
+		if (!$result) {
+			if ($this->httpClient->getError() !== '') {
 				throw new Exception($this->httpClient->getError());
-			}else
+			} else
 				throw new Exception("Null result, with URL:[$url]");
 		}
 
 		$json = json_decode($result);
-		if(!empty($json->errcode) &&
-			($json->errcode === 40001 || $json->errcode == '40001')){//try again and update the cached accesstoken
+		if (
+			!empty($json->errcode) &&
+			($json->errcode === 40001 || $json->errcode == '40001')
+		) { //try again and update the cached accesstoken
 			$atnew = $this->getAccessToken(true);
 			$querydata['access_token'] = $atnew;
-			$url2 = $url . "?".http_build_query($querydata);
+			$url2 = $url . "?" . http_build_query($querydata);
 			$result = $this->httpClient->get($url2);
 		}
 
-		if($raw === true){
+		if ($raw === true) {
 			return $result;
 		}
 
-		try{
+		try {
 			$json = $this->processResult($result);
-		}catch (Exception $e){
+		} catch (Exception $e) {
 			error_log($url);
-			error_log(print_r($e,true));
+			error_log(print_r($e, true));
 			throw $e;
 		}
 		return $json;
@@ -160,33 +162,33 @@ class WechatAppApiClient {
 	protected function post($url, $params, $raw = false, $querydata = []) {
 		$at = $this->getAccessToken();
 		$querydata['access_token'] = $at;
-		$url2 = $url . "?".http_build_query($querydata);
-		$result = $this->httpClient->post($url2,$params);
-		if(!$result){
-			if($this->httpClient->getError() !== ''){
+		$url2 = $url . "?" . http_build_query($querydata);
+		$result = $this->httpClient->post($url2, $params);
+		if (!$result) {
+			if ($this->httpClient->getError() !== '') {
 				throw new Exception($this->httpClient->getError());
-			}else{
-				$paramstr = print_r($params,true);
+			} else {
+				$paramstr = print_r($params, true);
 				throw new Exception("Null result, with URL:[$url2],POSTFIELDS = [$paramstr]");
 			}
 		}
 
 		$json = json_decode($result);
-		if(!$json){
+		if (!$json) {
 			return $result;
-		}else{
-			if(!empty($json->errcode)){
-				if($json->errcode === 40001){//try again and update the cached accesstoken
+		} else {
+			if (!empty($json->errcode)) {
+				if ($json->errcode === 40001) { //try again and update the cached accesstoken
 					$atnew = $this->getAccessToken(true);
 					$querydata['access_token'] = $atnew;
-					$url2 = $url . "?".http_build_query($querydata);
-					$result = $this->httpClient->post($url2,$params);
-				}else{
+					$url2 = $url . "?" . http_build_query($querydata);
+					$result = $this->httpClient->post($url2, $params);
+				} else {
 					throw new Exception($json->errmsg);
 				}
 			}
 
-			if($raw === true) return $result;
+			if ($raw === true) return $result;
 		}
 
 
@@ -194,27 +196,27 @@ class WechatAppApiClient {
 		return $json;
 	}
 
-	private function processResult($result){
+	private function processResult($result) {
 		$json = json_decode($result);
 
-		if($json === null){
+		if ($json === null) {
 			throw new Exception("Bad formatted JSON - {$result}");
 		}
-		if(!empty($json->errcode) && $json->errcode !== 0){// invalid credential, access_token is invalid or not latest
+		if (!empty($json->errcode) && $json->errcode !== 0) { // invalid credential, access_token is invalid or not latest
 			throw new Exception("[{$json->errcode}]{$json->errmsg}");
 		}
 		return $json;
 	}
 
-	public function decryptData($sessionKey, $encryptedData, $iv){
-		return (new Crypto())->decryptData($sessionKey,$encryptedData,$iv);
+	public function decryptData($sessionKey, $encryptedData, $iv) {
+		return (new Crypto())->decryptData($sessionKey, $encryptedData, $iv);
 	}
-	public function decryptData0($sessionKey, $encryptedData, $iv){
+	public function decryptData0($sessionKey, $encryptedData, $iv) {
 		$this->sessionKey = $sessionKey;
-		$aesKey=base64_decode($this->sessionKey);
+		$aesKey = base64_decode($this->sessionKey);
 
 
-		$aesIV=base64_decode($iv);
+		$aesIV = base64_decode($iv);
 		try {
 			$decrypted = openssl_decrypt(base64_decode($encryptedData), 'aes-128-cbc', $aesKey, OPENSSL_RAW_DATA, $aesIV);
 			error_log('&&&$decrypted');
@@ -240,18 +242,18 @@ class WechatAppApiClient {
 	 * @param $text 需要进行填充补位操作的明文
 	 * @return 补齐明文字符串
 	 */
-	function encode( $text ) {
+	function encode($text) {
 		$block_size = 16;
-		$text_length = strlen( $text );
+		$text_length = strlen($text);
 		//计算需要填充的位数
-		$amount_to_pad = $block_size - ( $text_length % $block_size);
-		if ( $amount_to_pad == 0 ) {
+		$amount_to_pad = $block_size - ($text_length % $block_size);
+		if ($amount_to_pad == 0) {
 			$amount_to_pad = $block_size;
 		}
 		//获得补位所用的字符
-		$pad_chr = chr( $amount_to_pad );
+		$pad_chr = chr($amount_to_pad);
 		$tmp = "";
-		for ( $index = 0; $index < $amount_to_pad; $index++ ) {
+		for ($index = 0; $index < $amount_to_pad; $index++) {
 			$tmp .= $pad_chr;
 		}
 		return $text . $tmp;
